@@ -48,6 +48,11 @@
 
 int main(int argc, char** argv)
 {
+  if (argc != 2) {
+    cout << "Dwater を正しく指定してください" << endl;
+    return 1;
+  }
+  
   // ---------- start stop watch ----------
   struct timeval tv;
   struct timezone tz;
