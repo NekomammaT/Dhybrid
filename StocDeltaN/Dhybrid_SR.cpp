@@ -10,7 +10,7 @@
 
 // ---------- potential parameter ----------
 #define AS (2.189e-9)
-#define PI2 50
+#define PI2 2000
 #define MM 0.1
 #define PHIC (0.1*sqrt(2))
 #define MU2 10 //11
@@ -33,7 +33,7 @@
 //#define DWATER 1000 // # of waterfalls
 // -----------------------------------------
 
-#define RHOC 2.0740381070099973e-16 //(2.074038e-16) // end of inflation
+#define RHOC 1 //(2.074038e-16) // end of inflation
 
 // ---------- for SDE ----------------------
 #define RECURSION 10000 // recursion for power spectrum
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
   xsite.push_back(site);
   site.clear();
 
-  double hpsimin = Dwater*SIGMAPSI/10;
+  double hpsimin = Dwater*SIGMAPSI/20;
   
   sitev = PSIMIN;
   while (sitev <= PSIMAX) {
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
   // ----------------------------------
 
   vector<double> params = {MAXSTEP,TOL,2,RHOC,(double)sitepack[0].size(),TIMESTEP,NMAX,DELTAN,RECURSION //,NCUT
-    ,Dwater // for Dhybrid
+    ,Dwater,1 // for Dhybrid
   }; // set parameters
 
   vector< vector<double> > xpi = {{PHIIN, Dwater*SIGMAPSI //PSIIN
@@ -109,13 +109,21 @@ int main(int argc, char** argv)
     + string("_D=") + to_string((int)Dwater);
   StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
   
-  //sdn.sample(); // obtain 1 sample path
+  sdn.sample(); // obtain 1 sample path
   //sdn.sample_logplot(); // plot obtained sample path
+
+  cout << endl;
+
+  double rhoc = sdn.return_V();
+
+  params[3] = rhoc;
+  params[10] = 0;
+  StocDeltaN sdn2(model,sitepack,xpi,0,params);
   
-  sdn.solve(); // solve PDE & SDE to obtain power spectrum
-  sdn.f_logplot(0); // show plot of <N>
-  sdn.f_logplot(1); // show plot of <delta N^2>
-  sdn.calP_plot(); // show plot of power spectrum of zeta
+  sdn2.solve(); // solve PDE & SDE to obtain power spectrum
+  sdn2.f_logplot(0); // show plot of <N>
+  sdn2.f_logplot(1); // show plot of <delta N^2>
+  sdn2.calP_plot(); // show plot of power spectrum of zeta
 
 
   // ---------- stop stop watch ----------
@@ -215,7 +223,10 @@ double StocDeltaN::gIa(int xp, int I, int alpha, vector< vector<double> > &psv)
 
 bool StocDeltaN::EndSurface(vector< vector<double> > &psv)
 {
-  return V(psv[0]) >= rhoc;
-  //return abs(etaV(psv[0])) < 2 || psv[0][0] > PHIC;
-  //return eV(psv[0]) < 1e-5*(50./PI2)*(50./PI2);
+  if (SRend) {
+    return abs(etaV(psv[0])) < 2 || psv[0][0] > PHIC;
+    //return eV(psv[0]) < 1e-5*(50./PI2)*(50./PI2);
+  } else {
+    return V(psv[0]) >= rhoc;
+  }
 }

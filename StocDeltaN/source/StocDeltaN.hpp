@@ -29,6 +29,7 @@ protected:
 
   // ----------- for Dhybrid ------------
   double Dwater; // # of waterfall
+  bool SRend; // end by eta = 2 or V < rhoc
   // ------------------------------------
   
 public:
@@ -41,6 +42,7 @@ public:
 
   // -------------- for Dhybrid ---------------
   // Params[9] == Dwater
+  // Params[10] == SRend
   // ------------------------------------------
   
   void solve(); // execute stochastic-delta N

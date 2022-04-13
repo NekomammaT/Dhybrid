@@ -15,6 +15,7 @@ StocDeltaN::StocDeltaN(string Model, vector< vector< vector<double> > > &Site,
 
   // --------- for Dhybrid ---------------
   Dwater = Params[9];
+  SRend = Params[10];
   // -------------------------------------
   
   xpdim = JacobiPDE::xpdim;
