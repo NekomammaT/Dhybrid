@@ -25,7 +25,7 @@
 #define PHIMAX PHIC + 20/MU1 //0.142
 #define PSIMIN -(1e-3)
 #define PSIMAX (1e-3)
-#define HPHI 1./MU1/2 //(1e-5)
+#define HPHI 1./MU1/5 //(1e-5)
 #define HPSIOPSI (1e-2) // hpsi/|psi|
 //#define HPSIMIN (1e-10)
 //#define NCUT 50
