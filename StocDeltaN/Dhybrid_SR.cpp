@@ -21,11 +21,11 @@
 // -----------------------------------------
 
 // ---------- box size & step h ------------
-#define PHIMIN 0.1412 //PHIC*(1-MM*MM/8.) //0.1409
+#define PHIMIN 0.1409 //PHIC*(1-MM*MM/8.) //0.1409
 #define PHIMAX PHIC + 20/MU1 //0.142
 #define PSIMIN -(1e-3)
 #define PSIMAX (1e-3)
-#define HPHI 1./MU1/2 //(1e-5)
+#define HPHI 1e-5 //1./MU1/2 //(1e-5)
 #define HPSIOPSI (1e-2) // hpsi/|psi|
 //#define HPSIMIN (1e-10)
 //#define NCUT 50
@@ -33,7 +33,7 @@
 //#define DWATER 1000 // # of waterfalls
 // -----------------------------------------
 
-#define RHOC 2.0740381364697194e-16 //(2.074038e-16) // end of inflation
+#define RHOC 2.0740381070099973e-16 //(2.074038e-16) // end of inflation
 
 // ---------- for SDE ----------------------
 #define RECURSION 10000 // recursion for power spectrum
@@ -216,6 +216,6 @@ double StocDeltaN::gIa(int xp, int I, int alpha, vector< vector<double> > &psv)
 bool StocDeltaN::EndSurface(vector< vector<double> > &psv)
 {
   return V(psv[0]) >= rhoc;
-  //return abs(etaV(psv[0])) < 1 || psv[0][0] > PHIC;
+  //return abs(etaV(psv[0])) < 2 || psv[0][0] > PHIC;
   //return eV(psv[0]) < 1e-5*(50./PI2)*(50./PI2);
 }
