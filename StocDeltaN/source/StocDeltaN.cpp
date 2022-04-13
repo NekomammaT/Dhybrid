@@ -1,6 +1,8 @@
 #include "StocDeltaN.hpp"
 #include "matplotlibcpp.hpp"
 
+#define DATADIR "../data/"
+
 StocDeltaN::StocDeltaN(string Model, vector< vector< vector<double> > > &Site,
 		       vector< vector<double> > &XPi, double T0, vector<double> &Params):
   JacobiPDE(Site,Params), SRKintegrater(XPi,T0,Params[4])
@@ -10,6 +12,11 @@ StocDeltaN::StocDeltaN(string Model, vector< vector< vector<double> > > &Site,
   Nmax = Params[6];
   deltaN = Params[7];
   recursion = Params[8];
+
+  // --------- for Dhybrid ---------------
+  Dwater = Params[9];
+  // -------------------------------------
+  
   xpdim = JacobiPDE::xpdim;
   Idim = JacobiPDE::Idim;
   //BoundaryCondition(Params[9]);
@@ -161,12 +168,21 @@ void StocDeltaN::solve()
   PDE_solve(0);
   PDE_solve(1);
   
-  string str = "Mn_" + model + ".dat";
+  //string str = "Mn_" + model + ".dat";
+
+  // ---------- for Dhybrid -----------
+  string str = DATADIR + string("Mn_") + model + ".dat";
+  // ----------------------------------
 
   export_fg(str);
 
   vector< vector<double> > dN2List[recursion];
-  str = "traj_" + model + ".dat";
+  //str = "traj_" + model + ".dat";
+  
+  // ---------- for Dhybrid ------------
+  str = DATADIR + string("traj_") + model + ".dat";
+  // -----------------------------------
+  
   ofstream trajfile(str);
   double dt = timestep;
   int recNo = 0;
@@ -261,6 +277,8 @@ void StocDeltaN::solve()
       dN2List[i].push_back({N,dN2});
     }
 
+    // ---------- for Dhybrid -----------
+    ///*
 #ifdef _OPENMP
 #pragma omp critical
 #endif
@@ -268,12 +286,29 @@ void StocDeltaN::solve()
       recNo++;
       cout << "\r" << recNo << "/" << recursion << flush;
     }
+    //*/
+    // ----------------------------------
   }
+
+  // ----------- for Dhybrid ------------
+  //
   cout << endl;
+  // ------------------------------------
 
   double meandN2, predN2 = 0, errors, pres = 0;
-  str = "calP_" + model + ".dat";
+  //str = "calP_" + model + ".dat";
+
+  // ---------- for Dhybrid ------------
+  str = DATADIR + string("calP_") + model + ".dat";
+  // -----------------------------------
+  
   ofstream calPfile(str);
+
+  /*
+  // --------------- for Dhybrid ----------------
+  double calPmax = 0, maxN;
+  // --------------------------------------------
+  */
 
   for (int list=0; list<dN2List[0].size(); list++) {
     meandN2 = 0;
@@ -300,16 +335,36 @@ void StocDeltaN::solve()
     if (recNo > 1) {
       errors /= recNo*(recNo-1);
     }
-    
+
+        
     calPfile << dN2List[0][list][0] << ' '
 	     << (meandN2-predN2)/deltaN << ' '
 	     << sqrt(errors + pres)/deltaN  << endl;
     Ndata.push_back(dN2List[0][list][0]);
     calPdata.push_back((meandN2-predN2)/deltaN);
     calPerror.push_back(sqrt(errors + pres)/deltaN);
+
+    /*
+    // ------------- for Dhybrid ---------------
+    if ((meandN2-predN2)/deltaN > calPmax) {
+      calPmax = (meandN2-predN2)/deltaN;
+      maxN = dN2List[0][list][0];
+    }
+    // -----------------------------------------
+    */
+    
     predN2 = meandN2;
     pres = errors;
   }
+
+  /*
+  // ----------- for Dhybrid ---------------
+  str = DATADIR + string("maxPdata.dat");
+  ofstream maxPfile(str,std::ios::app);
+  
+  maxPfile << Dwater << ' ' << maxN << ' ' << calPmax << endl;
+  // ---------------------------------------
+  */
 }
 
 void StocDeltaN::sample()
@@ -324,7 +379,12 @@ void StocDeltaN::sample()
     Hi = return_H();
   }
   
-  string str = "sample_" + model + ".dat";
+  //string str = "sample_" + model + ".dat";
+
+  // -------- for Dhybrid -----------
+  string str = DATADIR + string("sample_") + model + ".dat";
+  // --------------------------------
+  
   ofstream ofs(str);
   double dt = timestep;
 
@@ -350,9 +410,9 @@ void StocDeltaN::sample()
     }
     ofs << setprecision(17);
     if (xpdim == 1) {
-      ofs << return_V() << ' ';
+      ofs << return_V() << ' ' << return_eV() << ' ' << return_etaV() << ' ';
     } else if (xpdim == 2) {
-      ofs << return_H() << ' ';
+      ofs << return_H() << ' ' << return_e1() << ' ';
     }
     if (Idim == 2) {
       ofs << return_etaperp();
@@ -406,7 +466,9 @@ void StocDeltaN::sample()
     cout << "Hi = " << Hi << ",  Hf = " << return_H();
   }
   cout << setprecision(6) << endl;
-  if (xpdim == 2) {
+  if (xpdim == 1) {
+    cout << "eV = " << return_eV() << ", etaV = " << return_etaV() << endl;
+  } else if (xpdim == 2) {
     cout << "eH = " << return_e1() << endl;
   }
 }

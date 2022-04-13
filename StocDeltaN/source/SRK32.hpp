@@ -36,11 +36,15 @@ public:
   void init_txp(); // initialize t and phase-space value to initial values
   void set_txp(double T, vector< vector<double> > &PSV); // set t and phase-space value by arbitrary values T and PSV
   double e1(vector<double> &X, vector<double> &P); // first SR param. -\dot{H}/H^2
+  double eV(vector<double> &X); // first potential SR param.
+  double etaV(vector<double> &X); // second potential SR param.
   double return_H(); // return current Hubble
   double return_V(); // return current potential
   double return_t(); // return current time
   double return_xp(int xp, int I); // return current phase-space value in xpI direction
   double return_e1(); // return current -\dot{H}/H^2
+  double return_eV(); // return current eV
+  double return_etaV(); // return current etaV
   double vielbein(vector< vector<double> > &XP, int I, int alpha); // projection from field coordinate xpI to noise frame alpha
   double eIsigma(vector< vector<double> > &XP, int I); // projection to adiabatic direction
   double eIs(vector< vector<double> > &XP, int I, int alpha); // projection to entropic direction labeled by alpha
@@ -49,6 +53,7 @@ public:
   virtual double H(vector<double> &X, vector<double> &P); // Hubble parameter
   virtual double V(vector<double> &X); // potential
   virtual double VI(vector<double> &X, int I); // \partial_I V
+  virtual double VIJ(vector<double> &X, int I, int J); // \partial_I \partial_J V
   virtual double metric(vector<double> &X, int I, int J); // field-space metric G_IJ
   virtual double inversemetric(vector<double> &X, int I, int J); // inverse field-space metric G^IJ
   virtual double affine(vector<double> &X, int I, int J, int K); // Christoffel symbol Gamma^I_JK

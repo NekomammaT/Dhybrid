@@ -487,14 +487,21 @@ void JacobiPDE::PDE_solve(int func)
       }
     }
     err = sqrt(err)/sqrt(u_norm);
+
+    // ------- for Dhybrid ---------
+    //
     cout << "\rerr" << func+1 << " : " << setw(11) << left << err << "  step : " << step << flush;
+    // -----------------------------
 
     if (err < tol) {
       break;
     }
   }
 
+  // --------- for Dhybrid -----------
+  //
   cout << endl;
+  // ---------------------------------
 }
 
 int JacobiPDE::Ind2No(vector< vector<int> > &index)

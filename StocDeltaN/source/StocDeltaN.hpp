@@ -26,6 +26,10 @@ protected:
   // Ndata : data variable for <N> in power spectrum calculation
   // calPdata : data variable for power spectrum
   // calPerror : error data of calP
+
+  // ----------- for Dhybrid ------------
+  double Dwater; // # of waterfall
+  // ------------------------------------
   
 public:
   StocDeltaN(){}
@@ -34,6 +38,11 @@ public:
   // Params[0] = maxstep, Params[1] = tol, Params[2] = funcNo, Params[3] = rhoc,
   // Params[4] = NoiseDim, Params[5] = timestep, Params[6] = Nmax, Params[7] = deltaN,
   // Params[8] = recursion
+
+  // -------------- for Dhybrid ---------------
+  // Params[9] == Dwater
+  // ------------------------------------------
+  
   void solve(); // execute stochastic-delta N
   void sample(); // obtain 1 sample path
 
@@ -62,6 +71,7 @@ public:
 
   virtual double V(vector<double> &X); // potential
   virtual double VI(vector<double> &X, int I); // \partial_I V
+  virtual double VIJ(vector<double> &X, int I, int J);
   //virtual double metric(vector<double> &X, int I, int J); // field-space metric G_IJ
   //virtual double inversemetric(vector<double> &X, int I, int J); // inverse field-space metric G^IJ
   //virtual double affine(vector<double> &X, int I, int J, int K); // Christoffel symbol Gamma^I_JK
@@ -74,7 +84,7 @@ public:
   virtual double DIJ(int xpI, int I, int xpJ, int J, vector< vector<double> > &psv);
   virtual double gIa(int xp, int I, int alpha, vector< vector<double> > &psv);
   //virtual double CC(int num, vector< vector<double> > &psv, int func);
-  //virtual bool EndSurface(vector< vector<double> > &psv);
+  virtual bool EndSurface(vector< vector<double> > &psv);
   // -----------------------------------------------------------------
 };
 

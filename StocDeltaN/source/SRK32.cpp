@@ -37,6 +37,20 @@ double SRKintegrater::VI(vector<double> &X, int I)
   }
 }
 
+double SRKintegrater::VIJ(vector<double> &X, int I, int J) 
+{
+  double m1 = 0.01;
+  double m2 = 0.1;
+
+  if (I == 0 && J == 0) {
+    return m1*m1;
+  } else if (I == 1 && J == 1) {
+    return m2*m2;
+  } else {
+    return 0;
+  }
+}
+
 double SRKintegrater::metric(vector<double> &X, int I, int J)
 {
   double MM = 1e-3;
@@ -370,6 +384,36 @@ double SRKintegrater::e1(vector<double> &X, vector<double> &P)
   return e1;
 }
 
+double SRKintegrater::eV(vector<double> &X)
+{
+  double eV = 0;
+
+  for (int I=0; I<Idim; I++) {
+    for (int J=0; J<Idim; J++) {
+      eV += inversemetric(X,I,J)*VI(X,I)*VI(X,J);
+    }
+  }
+
+  eV /= V(X)*V(X)*2;
+
+  return eV;
+}
+
+double SRKintegrater::etaV(vector<double> &X)
+{
+  double etaV = 0;
+
+  for (int I=0; I<Idim; I++) {
+    for (int J=0; J<Idim; J++) {
+      etaV += inversemetric(X,I,J)*VIJ(X,I,J);
+    }
+  }
+
+  etaV /= V(X);
+
+  return etaV;
+}
+
 double SRKintegrater::return_H()
 {
   return H(xx[0],xx[1]);
@@ -393,6 +437,16 @@ double SRKintegrater::return_xp(int xp, int I)
 double SRKintegrater::return_e1()
 {
   return e1(xx[0],xx[1]);
+}
+
+double SRKintegrater::return_eV()
+{
+  return eV(xx[0]);
+}
+
+double SRKintegrater::return_etaV()
+{
+  return etaV(xx[0]);
 }
 
 double SRKintegrater::vielbein(vector< vector<double> > &XP, int I, int alpha)
