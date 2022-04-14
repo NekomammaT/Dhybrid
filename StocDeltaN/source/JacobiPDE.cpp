@@ -489,8 +489,7 @@ void JacobiPDE::PDE_solve(int func)
     err = sqrt(err)/sqrt(u_norm);
 
     // ------- for Dhybrid ---------
-    //
-    cout << "\rerr" << func+1 << " : " << setw(11) << left << err << "  step : " << step << flush;
+    //cout << "\rerr" << func+1 << " : " << setw(11) << left << err << "  step : " << step << flush;
     // -----------------------------
 
     if (err < tol) {
@@ -499,8 +498,7 @@ void JacobiPDE::PDE_solve(int func)
   }
 
   // --------- for Dhybrid -----------
-  //
-  cout << endl;
+  //cout << endl;
   // ---------------------------------
 }
 

@@ -9,20 +9,20 @@
 // -----------------------------------------
 
 // ---------- potential parameter ----------
-#define AS (2.189e-9)
-#define PI2 2000
+#define AS 2.1e-9
+//#define PI2 2000
 #define MM 0.1
 #define PHIC (0.1*sqrt(2))
-#define MU2 10 //11
-#define MU1 (PI2/MM/MM/PHIC)
-#define LAMBDA4 (AS*12*M_PI*M_PI/MU1/MU1)
+#define MU2 10.7
+//#define MU1 (PI2/MM/MM/PHIC)
+//#define LAMBDA4 (AS*12*M_PI*M_PI/MU1/MU1)
 
-#define SIGMAPSI sqrt(LAMBDA4*sqrt(PI2)/48./sqrt(2*M_PI)/M_PI)
+//#define SIGMAPSI sqrt(LAMBDA4*sqrt(PI2)/48./sqrt(2*M_PI)/M_PI)
 // -----------------------------------------
 
 // ---------- box size & step h ------------
 #define PHIMIN 0.1409 //PHIC*(1-MM*MM/8.) //0.1409
-#define PHIMAX PHIC + 20/MU1 //0.142
+//#define PHIMAX PHIC + 20/MU1 //0.142
 #define PSIMIN -(1e-3)
 #define PSIMAX (1e-3)
 #define HPHI 1e-5 //1./MU1/2 //(1e-5)
@@ -37,26 +37,49 @@
 
 // ---------- for SDE ----------------------
 #define RECURSION 10000 // recursion for power spectrum
-#define PHIIN PHIC + 10/MU1 //0.1418 // i.c. for phi
+//#define PHIIN PHIC + 10/MU1 //0.1418 // i.c. for phi
 //#define PSIIN sqrt(LAMBDA4*sqrt(PI2)/48./sqrt(2*M_PI)/M_PI) //1e-10 //0 // i.c. for psi
 #define TIMESTEP (1e-3) // time step : delta N
 // -----------------------------------------
 
 // ---------- for power spectrum -----------
 #define DELTAN 0.5 // 0.1 // calc. PS every DELTAN e-folds
-#define NMAX sqrt(10*PI2)/2.+10 //25 // 28 // calc. PS for 0--NMAX e-folds
+//#define NMAX sqrt(10*PI2)/2.+10 //25 // 28 // calc. PS for 0--NMAX e-folds
 // -----------------------------------------
 
 
 int main(int argc, char** argv)
 {
   // -------- for Dhybrid ------------
-  if (argc != 2) {
-    cout << "Dwater を正しく指定してください" << endl;
+  if (argc != 3) {
+    cout << "Pi2 と Dwater を正しく指定してください" << endl;
     return 1;
   }
 
-  double Dwater = atof(argv[1]);
+  double Pi2 = atof(argv[1]);
+  double Dwater = atof(argv[2]);
+  
+  double mu1 = Pi2/MM/MM/PHIC;
+  double Lambda4 = AS*12*M_PI*M_PI/mu1/mu1;
+  double sigmapsi = sqrt(Dwater*Lambda4*sqrt(Pi2)/48./sqrt(2*M_PI)/M_PI);
+  
+  double phimax = PHIC + 20./mu1;
+  double hpsimin = sigmapsi/10;
+  double phiin = PHIC + 15./mu1;
+  double psiin = sigmapsi;
+  
+  double chi2 = log(sqrt(PHIC)*MM/2/sqrt(mu1)/sigmapsi);
+  double NPT = sqrt(Pi2)*(sqrt(chi2)/2 + 1./4/sqrt(chi2));
+  double xif = -NPT/PHIC/mu1;
+  double chif = 4*PHIC*mu1*xif*xif/MM/MM;
+  double phif = PHIC*exp(xif);
+  double psif = sigmapsi*exp(chif);
+  double rhoc = Lambda4*((1-psif*psif/MM/MM)*(1-psif*psif/MM/MM)
+			 + 2*phif*phif*psif*psif/PHIC/PHIC/MM/MM
+			 + (phif-PHIC)/mu1
+			 - (phif-PHIC)*(phif-PHIC)/MU2/MU2);
+  
+  double Nmax = NPT + 10;
   // ---------------------------------
   
   // ---------- start stop watch ----------
@@ -67,25 +90,24 @@ int main(int argc, char** argv)
   gettimeofday(&tv, &tz);
   before = (double)tv.tv_sec + (double)tv.tv_usec * 1.e-6;
   // --------------------------------------
-
+  
 
   // ---------- set box ---------------
   double h = HPHI, sitev = PHIMIN;
   vector<double> site;
   vector< vector<double> > xsite;
   vector< vector< vector<double> > > sitepack;
-  while (sitev <= PHIMAX) {
+  while (sitev <= //PHIMAX
+	 phimax) {
     site.push_back(sitev);
     sitev += h;
   }
   xsite.push_back(site);
   site.clear();
-
-  double hpsimin = Dwater*SIGMAPSI/20;
   
   sitev = PSIMIN;
   while (sitev <= PSIMAX) {
-    h = max(fabs(sitev)*HPSIOPSI,hpsimin //HPSIMIN
+    h = max(fabs(sitev)*HPSIOPSI, hpsimin //HPSIMIN
 	    );
 
     site.push_back(sitev);
@@ -98,32 +120,35 @@ int main(int argc, char** argv)
   xsite.clear();
   // ----------------------------------
 
-  vector<double> params = {MAXSTEP,TOL,2,RHOC,(double)sitepack[0].size(),TIMESTEP,NMAX,DELTAN,RECURSION //,NCUT
-    ,Dwater,1 // for Dhybrid
+  vector<double> params = {MAXSTEP,TOL,2,rhoc //RHOC
+    ,(double)sitepack[0].size(),TIMESTEP,Nmax //NMAX
+    ,DELTAN,RECURSION //,NCUT
+    ,Pi2,Dwater,Lambda4,mu1,0 // for Dhybrid
   }; // set parameters
 
-  vector< vector<double> > xpi = {{PHIIN, Dwater*SIGMAPSI //PSIIN
+  vector< vector<double> > xpi = {{phiin, //PHIIN,
+      psiin //PSIIN
     }}; // set i.c. for inflationary trajectories
 
-  string model = string(MODEL) + string("_Pi2=") + to_string(PI2)
+  string model = string(MODEL) + string("_Pi2=") + to_string((int)Pi2)
     + string("_D=") + to_string((int)Dwater);
   StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
   
-  sdn.sample(); // obtain 1 sample path
+  //sdn.sample(); // obtain 1 sample path
   //sdn.sample_logplot(); // plot obtained sample path
 
-  cout << endl;
+  //cout << endl;
 
-  double rhoc = sdn.return_V();
+  //double rhoc = sdn.return_V();
 
-  params[3] = rhoc;
-  params[10] = 0;
-  StocDeltaN sdn2(model,sitepack,xpi,0,params);
+  //params[3] = rhoc;
+  //params[12] = 0;
+  //StocDeltaN sdn2(model,sitepack,xpi,0,params);
   
-  sdn2.solve(); // solve PDE & SDE to obtain power spectrum
-  sdn2.f_logplot(0); // show plot of <N>
-  sdn2.f_logplot(1); // show plot of <delta N^2>
-  sdn2.calP_plot(); // show plot of power spectrum of zeta
+  sdn.solve(); // solve PDE & SDE to obtain power spectrum
+  //sdn2.f_logplot(0); // show plot of <N>
+  //sdn2.f_logplot(1); // show plot of <delta N^2>
+  //sdn2.calP_plot(); // show plot of power spectrum of zeta
 
 
   // ---------- stop stop watch ----------
@@ -138,34 +163,40 @@ int main(int argc, char** argv)
 
 double StocDeltaN::V(vector<double> &X)
 {
-  return LAMBDA4*((1-X[1]*X[1]/MM/MM)*(1-X[1]*X[1]/MM/MM)
-		  + 2*X[0]*X[0]*X[1]*X[1]/PHIC/PHIC/MM/MM + (X[0]-PHIC)/MU1
-		  - (X[0]-PHIC)*(X[0]-PHIC)/MU2/MU2);
+  return //LAMBDA4
+    Lambda4*((1-X[1]*X[1]/MM/MM)*(1-X[1]*X[1]/MM/MM)
+	     + 2*X[0]*X[0]*X[1]*X[1]/PHIC/PHIC/MM/MM + (X[0]-PHIC)/mu1 //MU1
+	     - (X[0]-PHIC)*(X[0]-PHIC)/MU2/MU2);
 }
 
 double StocDeltaN::VI(vector<double> &X, int I) // \partial_I V
 {
   if (I == 0) {
-    return LAMBDA4*(1./MU1 - 2*(X[0]-PHIC)/MU2/MU2 + 4*X[0]*X[1]*X[1]/PHIC/PHIC/MM/MM);
+    return //LAMBDA4
+      Lambda4*(1./mu1 //MU1
+	       - 2*(X[0]-PHIC)/MU2/MU2 + 4*X[0]*X[1]*X[1]/PHIC/PHIC/MM/MM);
   } else {
-    return LAMBDA4*(4*X[0]*X[0]*X[1]/PHIC/PHIC/MM/MM
-		    - 4*X[1]*(1-X[1]*X[1]/MM/MM)/MM/MM);
+    return //LAMBDA4
+      Lambda4*(4*X[0]*X[0]*X[1]/PHIC/PHIC/MM/MM
+	       - 4*X[1]*(1-X[1]*X[1]/MM/MM)/MM/MM);
   }
 }
 
 double StocDeltaN::VIJ(vector<double> &X, int I, int J)
 {
   if (I == 0 && J == 0) {
-    return LAMBDA4*(4*X[1]*X[1]/MM/MM/PHIC/PHIC - 2./MU2/MU2);
+    return //LAMBDA4
+      Lambda4*(4*X[1]*X[1]/MM/MM/PHIC/PHIC - 2./MU2/MU2);
   } else if (I == 1 && J == 1) {
-    return 4*LAMBDA4*(MM*MM*(X[0]*X[0]-PHIC*PHIC) + 3*PHIC*PHIC*X[1]*X[1])
+    return 4* //LAMBDA4
+      Lambda4*(MM*MM*(X[0]*X[0]-PHIC*PHIC) + 3*PHIC*PHIC*X[1]*X[1])
       /MM/MM/MM/MM/PHIC/PHIC;
   } else {
-    return 8*X[0]*X[1]*LAMBDA4/MM/MM/PHIC/PHIC;
+    return 8*X[0]*X[1]* //LAMBDA4
+      Lambda4/MM/MM/PHIC/PHIC;
   }
 }
 
-/*
 double StocDeltaN::metric(vector<double> &X, int I, int J) // G_IJ
 {
   if (I == J) {
@@ -180,6 +211,7 @@ double StocDeltaN::inversemetric(vector<double> &X, int I, int J) // G^IJ
   return metric(X,I,J);
 }
 
+/*
 double StocDeltaN::affine(vector<double> &X, int I, int J, int K) // \Gamma^I_JK
 {
   return 0;
@@ -224,7 +256,7 @@ double StocDeltaN::gIa(int xp, int I, int alpha, vector< vector<double> > &psv)
 bool StocDeltaN::EndSurface(vector< vector<double> > &psv)
 {
   if (SRend) {
-    return abs(etaV(psv[0])) < 2 || psv[0][0] > PHIC;
+    return abs(etaV(psv[0])) < 2.5 || psv[0][0] > PHIC;
     //return eV(psv[0]) < 1e-5*(50./PI2)*(50./PI2);
   } else {
     return V(psv[0]) >= rhoc;

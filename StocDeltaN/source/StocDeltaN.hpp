@@ -28,7 +28,7 @@ protected:
   // calPerror : error data of calP
 
   // ----------- for Dhybrid ------------
-  double Dwater; // # of waterfall
+  double Pi2,Dwater,Lambda4,mu1; // # of waterfall
   bool SRend; // end by eta = 2 or V < rhoc
   // ------------------------------------
   
@@ -41,8 +41,11 @@ public:
   // Params[8] = recursion
 
   // -------------- for Dhybrid ---------------
-  // Params[9] == Dwater
-  // Params[10] == SRend
+  // Params[9] = Pi2
+  // Params[10] = Dwater
+  // Params[11] = Lambda4
+  // Params[12] = mu1
+  // Params[13] = SRend
   // ------------------------------------------
   
   void solve(); // execute stochastic-delta N
@@ -74,8 +77,8 @@ public:
   virtual double V(vector<double> &X); // potential
   virtual double VI(vector<double> &X, int I); // \partial_I V
   virtual double VIJ(vector<double> &X, int I, int J);
-  //virtual double metric(vector<double> &X, int I, int J); // field-space metric G_IJ
-  //virtual double inversemetric(vector<double> &X, int I, int J); // inverse field-space metric G^IJ
+  virtual double metric(vector<double> &X, int I, int J); // field-space metric G_IJ
+  virtual double inversemetric(vector<double> &X, int I, int J); // inverse field-space metric G^IJ
   //virtual double affine(vector<double> &X, int I, int J, int K); // Christoffel symbol Gamma^I_JK
   //virtual double derGamma(vector<double> &X, int I, int J, int K, int L); // Gamma^I_{JK,L}
 

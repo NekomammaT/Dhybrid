@@ -14,8 +14,11 @@ StocDeltaN::StocDeltaN(string Model, vector< vector< vector<double> > > &Site,
   recursion = Params[8];
 
   // --------- for Dhybrid ---------------
-  Dwater = Params[9];
-  SRend = Params[10];
+  Pi2 = Params[9];
+  Dwater = Params[10];
+  Lambda4 = Params[11];
+  mu1 = Params[12];
+  SRend = Params[13];
   // -------------------------------------
   
   xpdim = JacobiPDE::xpdim;
@@ -279,7 +282,7 @@ void StocDeltaN::solve()
     }
 
     // ---------- for Dhybrid -----------
-    ///*
+    /*
 #ifdef _OPENMP
 #pragma omp critical
 #endif
@@ -287,13 +290,12 @@ void StocDeltaN::solve()
       recNo++;
       cout << "\r" << recNo << "/" << recursion << flush;
     }
-    //*/
+    */
     // ----------------------------------
   }
 
   // ----------- for Dhybrid ------------
-  //
-  cout << endl;
+  //cout << endl;
   // ------------------------------------
 
   double meandN2, predN2 = 0, errors, pres = 0;
@@ -305,11 +307,9 @@ void StocDeltaN::solve()
   
   ofstream calPfile(str);
 
-  /*
   // --------------- for Dhybrid ----------------
   double calPmax = 0, maxN;
   // --------------------------------------------
-  */
 
   for (int list=0; list<dN2List[0].size(); list++) {
     meandN2 = 0;
@@ -345,27 +345,23 @@ void StocDeltaN::solve()
     calPdata.push_back((meandN2-predN2)/deltaN);
     calPerror.push_back(sqrt(errors + pres)/deltaN);
 
-    /*
     // ------------- for Dhybrid ---------------
     if ((meandN2-predN2)/deltaN > calPmax) {
       calPmax = (meandN2-predN2)/deltaN;
       maxN = dN2List[0][list][0];
     }
     // -----------------------------------------
-    */
     
     predN2 = meandN2;
     pres = errors;
   }
 
-  /*
   // ----------- for Dhybrid ---------------
   str = DATADIR + string("maxPdata.dat");
   ofstream maxPfile(str,std::ios::app);
   
-  maxPfile << Dwater << ' ' << maxN << ' ' << calPmax << endl;
+  maxPfile << Pi2 << ' ' << Dwater << ' ' << maxN << ' ' << calPmax << endl;
   // ---------------------------------------
-  */
 }
 
 void StocDeltaN::sample()
