@@ -79,22 +79,22 @@ void matplotlibcpp::yerrorbar(vector<double> X, vector<double> Y, vector<double>
 void matplotlibcpp::plot(vector<double> X, vector<double> Y, double lw, string color)
 {
   if (X.size() == Y.size()) {
-    if (!isnan(X[0]) && !isnan(Y[0])) {
-      fprintf(p, "plt.plot([%e", X[0]);
-    }
-    for (int i=1; i<X.size(); i++) {
-      if (!isnan(X[i]) && !isnan(Y[i])) {
+    fprintf(p, "plt.plot([");
+    
+    for (int i=0; i<X.size(); i++) {
+      if (isfinite(X[i]) && isfinite(Y[i])) {
 	fprintf(p, ",%e", X[i]);
       }
     }
-    if (!isnan(X[0]) && !isnan(Y[0])) {
-      fprintf(p, "],[%e", Y[0]);
-    }
-    for (int i=1; i<Y.size(); i++) {
-      if (!isnan(X[i]) && !isnan(Y[i])) {
+
+    fprintf(p,"], [");
+    
+    for (int i=0; i<Y.size(); i++) {
+      if (isfinite(X[i]) && isfinite(Y[i])) {
 	fprintf(p, ",%e", Y[i]);
       }
     }
+    
     fprintf(p, "], lw=%f, color=\"%s\")\n", lw, color.c_str());
   }
 }

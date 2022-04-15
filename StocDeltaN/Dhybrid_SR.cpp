@@ -64,7 +64,7 @@ int main(int argc, char** argv)
   double sigmapsi = sqrt(Dwater*Lambda4*sqrt(Pi2)/48./sqrt(2*M_PI)/M_PI);
   
   double phimax = PHIC + 20./mu1;
-  double hphi = 1./mu1;
+  double hphi = 1./mu1/10;
   double hpsimin = sigmapsi/10;
   double phiin = PHIC + 15./mu1;
   double psiin = sigmapsi;
