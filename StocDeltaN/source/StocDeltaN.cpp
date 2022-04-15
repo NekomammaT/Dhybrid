@@ -1,7 +1,7 @@
 #include "StocDeltaN.hpp"
 #include "matplotlibcpp.hpp"
 
-#define DATADIR "../data/"
+#define DATADIR "./data/"
 
 StocDeltaN::StocDeltaN(string Model, vector< vector< vector<double> > > &Site,
 		       vector< vector<double> > &XPi, double T0, vector<double> &Params):
@@ -282,7 +282,7 @@ void StocDeltaN::solve()
     }
 
     // ---------- for Dhybrid -----------
-    /*
+    ///*
 #ifdef _OPENMP
 #pragma omp critical
 #endif
@@ -290,12 +290,12 @@ void StocDeltaN::solve()
       recNo++;
       cout << "\r" << recNo << "/" << recursion << flush;
     }
-    */
+    //*/
     // ----------------------------------
   }
 
   // ----------- for Dhybrid ------------
-  //cout << endl;
+  cout << endl;
   // ------------------------------------
 
   double meandN2, predN2 = 0, errors, pres = 0;
@@ -346,7 +346,7 @@ void StocDeltaN::solve()
     calPerror.push_back(sqrt(errors + pres)/deltaN);
 
     // ------------- for Dhybrid ---------------
-    if ((meandN2-predN2)/deltaN > calPmax) {
+    if (isfinite((meandN2-predN2)/deltaN) && (meandN2-predN2)/deltaN > calPmax) {
       calPmax = (meandN2-predN2)/deltaN;
       maxN = dN2List[0][list][0];
     }

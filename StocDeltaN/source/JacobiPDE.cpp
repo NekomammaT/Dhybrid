@@ -460,8 +460,9 @@ double JacobiPDE::PDE_1step(int num, int func)
 void JacobiPDE::PDE_solve(int func)
 {
   double u_norm, err;
+  int step;
 
-  for (int step=0; step<maxstep; step++) {
+  for (step=0; step<maxstep; step++) {
     u_norm = 0;
     err = 0;
 
@@ -489,7 +490,7 @@ void JacobiPDE::PDE_solve(int func)
     err = sqrt(err)/sqrt(u_norm);
 
     // ------- for Dhybrid ---------
-    //cout << "\rerr" << func+1 << " : " << setw(11) << left << err << "  step : " << step << flush;
+    cout << "\rerr" << func+1 << " : " << setw(11) << left << err << "  step : " << step << flush;
     // -----------------------------
 
     if (err < tol) {
@@ -498,7 +499,9 @@ void JacobiPDE::PDE_solve(int func)
   }
 
   // --------- for Dhybrid -----------
-  //cout << endl;
+  cout << endl;
+
+  //cout << "err" << func+1 << " : " << setw(11) << left << err << "  step : " << step << endl;
   // ---------------------------------
 }
 

@@ -48,30 +48,30 @@ void matplotlibcpp::ylabel(string label)
 void matplotlibcpp::yerrorbar(vector<double> X, vector<double> Y, vector<double> Yerr, double capsize, string fmt, double markersize, string ecolor, string markeredgecolor, string color)
 {
   if (X.size() == Y.size() && Y.size() == Yerr.size()) {
-    if (!isnan(X[0])) {
-      fprintf(p, "plt.errorbar([%e", X[0]);
-    }
-    for (int i=1; i<X.size(); i++) {
-      if (!isnan(X[i])) {
+    fprintf(p, "plt.errorbar([");
+
+    for (int i=0; i<X.size(); i++) {
+      if (isfinite(X[i]) && isfinite(Y[i]) && isfinite(Yerr[i])) {
 	fprintf(p, ",%e", X[i]);
       }
     }
-    if (!isnan(Y[0])) {
-      fprintf(p, "], [%e", Y[0]);
-    }
-    for (int i=1; i<Y.size(); i++) {
-      if (!isnan(Y[i])) {
+
+    fprintf(p, "], [");
+
+    for (int i=0; i<Y.size(); i++) {
+      if (isfinite(X[i]) && isfinite(Y[i]) && isfinite(Yerr[i])) {
 	fprintf(p, ",%e", Y[i]);
       }
     }
-    if (!isnan(Yerr[0])) {
-      fprintf(p, "], yerr = [%e", Yerr[0]);
-    }
-    for (int i=1; i<Yerr.size(); i++) {
-      if (!isnan(Yerr[i])) {
+
+    fprintf(p, "], yerr = [");
+    
+    for (int i=0; i<Yerr.size(); i++) {
+      if (isfinite(X[i]) && isfinite(Y[i]) && isfinite(Yerr[i])) {
 	fprintf(p, ",%e", Yerr[i]);
       }
     }
+    
     fprintf(p, "], capsize=%f, fmt=\"%s\", markersize=%f, ecolor=\"%s\", markeredgecolor=\"%s\", color=\"%s\")\n", capsize, fmt.c_str(), markersize, ecolor.c_str(), markeredgecolor.c_str(), color.c_str());
   }
 }

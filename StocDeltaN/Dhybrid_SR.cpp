@@ -25,7 +25,7 @@
 //#define PHIMAX PHIC + 20/MU1 //0.142
 #define PSIMIN -(1e-3)
 #define PSIMAX (1e-3)
-#define HPHI 1e-5 //1./MU1/2 //(1e-5)
+//#define HPHI 1e-5 //1./MU1/2 //(1e-5)
 #define HPSIOPSI (1e-2) // hpsi/|psi|
 //#define HPSIMIN (1e-10)
 //#define NCUT 50
@@ -64,6 +64,7 @@ int main(int argc, char** argv)
   double sigmapsi = sqrt(Dwater*Lambda4*sqrt(Pi2)/48./sqrt(2*M_PI)/M_PI);
   
   double phimax = PHIC + 20./mu1;
+  double hphi = 1./mu1;
   double hpsimin = sigmapsi/10;
   double phiin = PHIC + 15./mu1;
   double psiin = sigmapsi;
@@ -93,7 +94,8 @@ int main(int argc, char** argv)
   
 
   // ---------- set box ---------------
-  double h = HPHI, sitev = PHIMIN;
+  double h = hphi, //HPHI,
+    sitev = PHIMIN;
   vector<double> site;
   vector< vector<double> > xsite;
   vector< vector< vector<double> > > sitepack;
@@ -146,9 +148,9 @@ int main(int argc, char** argv)
   //StocDeltaN sdn2(model,sitepack,xpi,0,params);
   
   sdn.solve(); // solve PDE & SDE to obtain power spectrum
-  //sdn2.f_logplot(0); // show plot of <N>
-  //sdn2.f_logplot(1); // show plot of <delta N^2>
-  //sdn2.calP_plot(); // show plot of power spectrum of zeta
+  sdn.f_logplot(0); // show plot of <N>
+  sdn.f_logplot(1); // show plot of <delta N^2>
+  sdn.calP_plot(); // show plot of power spectrum of zeta
 
 
   // ---------- stop stop watch ----------
@@ -156,6 +158,8 @@ int main(int argc, char** argv)
   after = (double)tv.tv_sec + (double)tv.tv_usec * 1.e-6;
   cout << after - before << " sec." << endl;
   // -------------------------------------
+
+  cout << endl;
 }
 
 
