@@ -603,6 +603,7 @@ void JacobiPDE::export_fg(string filename)
 {
   ofstream ofs(filename);
 
+  ofs << setprecision(10);
   for (int number=0; number<volume; number++) {
     for (int xp=0; xp<xpdim; xp++) {
       for (int I=0; I<Idim; I++) {

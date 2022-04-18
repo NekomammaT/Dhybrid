@@ -148,9 +148,9 @@ int main(int argc, char** argv)
   //StocDeltaN sdn2(model,sitepack,xpi,0,params);
   
   sdn.solve(); // solve PDE & SDE to obtain power spectrum
-  sdn.f_logplot(0); // show plot of <N>
-  sdn.f_logplot(1); // show plot of <delta N^2>
-  sdn.calP_plot(); // show plot of power spectrum of zeta
+  //sdn.f_logplot(0); // show plot of <N>
+  //sdn.f_logplot(1); // show plot of <delta N^2>
+  //sdn.calP_plot(); // show plot of power spectrum of zeta
 
 
   // ---------- stop stop watch ----------
