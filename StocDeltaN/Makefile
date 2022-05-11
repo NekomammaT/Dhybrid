@@ -7,7 +7,7 @@ SOURCE = source
 CXX := g++-11
 # Compiler option. Turn on -fopenmp for parallel computation
 #CXXFLAGS := -Xpreprocessor -fopenmp -lomp -std=c++11 -O2
-CXXFLAGS := -fopenmp -std=c++11 -O2 --sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+CXXFLAGS := -fopenmp -std=c++11 -O2 #--sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 
 $(MODEL): $(MODEL).o $(SOURCE)/JacobiPDE.o $(SOURCE)/SRK32.o $(SOURCE)/StocDeltaN.o
 	$(CXX) $(CXXFLAGS) -o $(MODEL) $(MODEL).o $(SOURCE)/JacobiPDE.o $(SOURCE)/SRK32.o $(SOURCE)/StocDeltaN.o

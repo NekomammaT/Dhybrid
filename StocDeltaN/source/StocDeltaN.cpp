@@ -220,7 +220,7 @@ void StocDeltaN::solve()
       ssdn.SRK2(dt);
 
       if (i == 0) {
-	trajfile << ssdn.return_t() << ' ';
+	trajfile << setprecision(10) << ssdn.return_t() << ' ';
 	for (int xp=0; xp<xpdim; xp++) {
 	  for (int I=0; I<Idim; I++) {
 	    trajfile << ssdn.return_xp(xp,I) << ' ';
@@ -399,7 +399,7 @@ void StocDeltaN::sample()
       }
     }
 
-    ofs << setprecision(6) << return_t() << ' ';
+    ofs << setprecision(10) << return_t() << ' ';
     for (int xp=0; xp<xpdim; xp++) {
       for (int I=0; I<Idim; I++) {
 	ofs << return_xp(xp,I) << ' ';

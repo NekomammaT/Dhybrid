@@ -21,7 +21,7 @@
 // -----------------------------------------
 
 // ---------- box size & step h ------------
-#define PHIMIN 0.1409 //PHIC*(1-MM*MM/8.) //0.1409
+//#define PHIMIN 0.1409 //0.1412 //PHIC*(1-MM*MM/8.) //0.1409
 //#define PHIMAX PHIC + 20/MU1 //0.142
 #define PSIMIN -(1e-3)
 #define PSIMAX (1e-3)
@@ -63,24 +63,38 @@ int main(int argc, char** argv)
   double Lambda4 = AS*12*M_PI*M_PI/mu1/mu1;
   double sigmapsi = sqrt(Dwater*Lambda4*sqrt(Pi2)/48./sqrt(2*M_PI)/M_PI);
   
-  double phimax = PHIC + 20./mu1;
+  double chi2 = log(sqrt(PHIC)*MM/2/sqrt(mu1)/sigmapsi);
+  double xi2 = -MM/2./sqrt(mu1*PHIC)*sqrt(chi2);
+  double NPT = sqrt(Pi2)*(sqrt(chi2)/2 + 1./4/sqrt(chi2));
+  double xif = -MM*MM/8.; //-NPT/PHIC/mu1;
+  double chif; //4*PHIC*mu1*xif*xif/MM/MM;
+  double phimin;
+
+  if (xi2 < xif) {
+    chif = 4*mu1*PHIC/MM/MM*xif*xif;
+    phimin = 0.1409;
+  } else {
+    chif = 1./2*log(8*mu1*PHIC/MM/MM*(xif*xif-xi2*xi2)+1) + chi2;
+    phimin = 0.1412;
+  }
+
   double hphi = 1./mu1/10;
   double hpsimin = sigmapsi/10;
-  double phiin = PHIC + 15./mu1;
   double psiin = sigmapsi;
+  double phimax, phiin;
   
-  double chi2 = log(sqrt(PHIC)*MM/2/sqrt(mu1)/sigmapsi);
-  double NPT = sqrt(Pi2)*(sqrt(chi2)/2 + 1./4/sqrt(chi2));
-  double xif = -NPT/PHIC/mu1;
-  double chif = 4*PHIC*mu1*xif*xif/MM/MM;
+  if (Pi2 > 1500) {
+    phimax = PHIC + 10./mu1;
+    phiin = PHIC + 5./mu1;
+  } else {
+    phimax = PHIC + 20./mu1;
+    phiin = PHIC + 15./mu1;
+  }
+  
   double phif = PHIC*exp(xif);
   double psif = sigmapsi*exp(chif);
-  double rhoc = Lambda4*((1-psif*psif/MM/MM)*(1-psif*psif/MM/MM)
-			 + 2*phif*phif*psif*psif/PHIC/PHIC/MM/MM
-			 + (phif-PHIC)/mu1
-			 - (phif-PHIC)*(phif-PHIC)/MU2/MU2);
-  
-  double Nmax = NPT + 10;
+
+  double Nmax = NPT + 15;
   // ---------------------------------
   
   // ---------- start stop watch ----------
@@ -95,7 +109,7 @@ int main(int argc, char** argv)
 
   // ---------- set box ---------------
   double h = hphi, //HPHI,
-    sitev = PHIMIN;
+    sitev = phimin; //PHIMIN;
   vector<double> site;
   vector< vector<double> > xsite;
   vector< vector< vector<double> > > sitepack;
@@ -122,30 +136,59 @@ int main(int argc, char** argv)
   xsite.clear();
   // ----------------------------------
 
-  vector<double> params = {MAXSTEP,TOL,2,rhoc //RHOC
-    ,(double)sitepack[0].size(),TIMESTEP,Nmax //NMAX
-    ,DELTAN,RECURSION //,NCUT
-    ,Pi2,Dwater,Lambda4,mu1,0 // for Dhybrid
-  }; // set parameters
-
+  vector<double> params;
+  double rhoc;
   vector< vector<double> > xpi = {{phiin, //PHIIN,
       psiin //PSIIN
     }}; // set i.c. for inflationary trajectories
 
   string model = string(MODEL) + string("_Pi2=") + to_string((int)Pi2)
     + string("_D=") + to_string((int)Dwater);
-  StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
+
+
+  if (xif > xi2) {
+    params = {MAXSTEP,TOL,2,RHOC
+      ,(double)sitepack[0].size(),TIMESTEP,Nmax //NMAX
+      ,DELTAN,RECURSION //,NCUT
+      ,Pi2,Dwater,Lambda4,mu1,1 // for Dhybrid
+    }; // set parameters
+
+    StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
   
-  sdn.sample(); // obtain 1 sample path
+    sdn.sample(); // obtain 1 sample path
+
+    cout << endl;
+    
+    rhoc = sdn.return_V();
+
+    params[3] = rhoc;
+    params[13] = 0;
+    StocDeltaN sdn2(model,sitepack,xpi,0,params);
+  
+    sdn2.solve(); // solve PDE & SDE to obtain power spectrum
+  } else {
+    rhoc = Lambda4*((1-psif*psif/MM/MM)*(1-psif*psif/MM/MM)
+		    + 2*phif*phif*psif*psif/PHIC/PHIC/MM/MM
+		    + (phif-PHIC)/mu1
+		    - (phif-PHIC)*(phif-PHIC)/MU2/MU2);
+
+    params = {MAXSTEP,TOL,2,rhoc
+      ,(double)sitepack[0].size(),TIMESTEP,Nmax //NMAX
+      ,DELTAN,RECURSION //,NCUT
+      ,Pi2,Dwater,Lambda4,mu1,0 // for Dhybrid
+    }; // set parameters
+
+    StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
+    
+    //sdn.sample();
+    sdn.solve(); // solve PDE & SDE to obtain power spectrum
+  }
+
+  
+  //StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
+  
+  //sdn.sample(); // obtain 1 sample path
   //sdn.sample_logplot(); // plot obtained sample path
-
-  //cout << endl;
-
-  //double rhoc = sdn.return_V();
-
-  //params[3] = rhoc;
-  //params[12] = 0;
-  //StocDeltaN sdn2(model,sitepack,xpi,0,params);
   
   //sdn.solve(); // solve PDE & SDE to obtain power spectrum
   //sdn.f_logplot(0); // show plot of <N>
@@ -260,7 +303,7 @@ double StocDeltaN::gIa(int xp, int I, int alpha, vector< vector<double> > &psv)
 bool StocDeltaN::EndSurface(vector< vector<double> > &psv)
 {
   if (SRend) {
-    return abs(etaV(psv[0])) < 2.5 || psv[0][0] > PHIC;
+    return abs(etaV(psv[0])) < 2 || psv[0][0] > PHIC;
     //return eV(psv[0]) < 1e-5*(50./PI2)*(50./PI2);
   } else {
     return V(psv[0]) >= rhoc;
