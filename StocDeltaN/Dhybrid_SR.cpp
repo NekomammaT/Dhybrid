@@ -70,6 +70,9 @@ int main(int argc, char** argv)
   double chif; //4*PHIC*mu1*xif*xif/MM/MM;
   double phimin;
 
+  cout << "xi2 = " << xi2 << ", xif = " << xif << endl;
+
+  /*
   if (xi2 < xif) {
     chif = 4*mu1*PHIC/MM/MM*xif*xif;
     phimin = 0.1409;
@@ -203,6 +206,7 @@ int main(int argc, char** argv)
   // -------------------------------------
 
   cout << endl;
+  */
 }
 
 

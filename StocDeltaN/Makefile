@@ -4,10 +4,11 @@ MODEL = Dhybrid_SR
 SOURCE = source
 
 # c++ compiler
-CXX := g++-11
+#CXX := g++-11
+CXX := g++
 # Compiler option. Turn on -fopenmp for parallel computation
-#CXXFLAGS := -Xpreprocessor -fopenmp -lomp -std=c++11 -O2
-CXXFLAGS := -fopenmp -std=c++11 -O2 #--sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
+CXXFLAGS := -Xpreprocessor -fopenmp -lomp -std=c++11 -O2
+#CXXFLAGS := -fopenmp -std=c++11 -O2 #--sysroot=/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk
 
 $(MODEL): $(MODEL).o $(SOURCE)/JacobiPDE.o $(SOURCE)/SRK32.o $(SOURCE)/StocDeltaN.o
 	$(CXX) $(CXXFLAGS) -o $(MODEL) $(MODEL).o $(SOURCE)/JacobiPDE.o $(SOURCE)/SRK32.o $(SOURCE)/StocDeltaN.o
