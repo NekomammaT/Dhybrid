@@ -13,7 +13,7 @@
 //#define PI2 2000
 #define MM 0.1
 #define PHIC (0.1*sqrt(2))
-#define MU2 10.7
+#define MU2 10 //10.7
 //#define MU1 (PI2/MM/MM/PHIC)
 //#define LAMBDA4 (AS*12*M_PI*M_PI/MU1/MU1)
 
