@@ -51,13 +51,14 @@
 int main(int argc, char** argv)
 {
   // -------- for Dhybrid ------------
-  if (argc != 3) {
-    cout << "Pi2 と Dwater を正しく指定してください" << endl;
+  if (argc != 4) {
+    cout << "Pi2, Dwater, DeltaV/V0 を正しく指定してください" << endl;
     return 1;
   }
-
+  
   double Pi2 = atof(argv[1]);
   double Dwater = atof(argv[2]);
+  double DeltaVoV0 = atof(argv[3]);
   
   double mu1 = Pi2/MM/MM/PHIC;
   double Lambda4 = AS*12*M_PI*M_PI/mu1/mu1;
@@ -70,12 +71,9 @@ int main(int argc, char** argv)
   double chif; //4*PHIC*mu1*xif*xif/MM/MM;
   double phimin;
 
-  cout << "xi2 = " << xi2 << ", xif = " << xif << endl;
-
-  /*
   if (xi2 < xif) {
     chif = 4*mu1*PHIC/MM/MM*xif*xif;
-    phimin = 0.1409;
+    phimin = 0.1408; //0.1409;
   } else {
     chif = 1./2*log(8*mu1*PHIC/MM/MM*(xif*xif-xi2*xi2)+1) + chi2;
     phimin = 0.1412;
@@ -85,7 +83,7 @@ int main(int argc, char** argv)
   double hpsimin = sigmapsi/10;
   double psiin = sigmapsi;
   double phimax, phiin;
-  
+
   if (Pi2 > 1500) {
     phimax = PHIC + 10./mu1;
     phiin = PHIC + 5./mu1;
@@ -93,9 +91,9 @@ int main(int argc, char** argv)
     phimax = PHIC + 20./mu1;
     phiin = PHIC + 15./mu1;
   }
-  
-  double phif = PHIC*exp(xif);
-  double psif = sigmapsi*exp(chif);
+
+  //double phif = PHIC*exp(xif);
+  //double psif = sigmapsi*exp(chif);
 
   double Nmax = NPT + 15;
   // ---------------------------------
@@ -148,7 +146,9 @@ int main(int argc, char** argv)
   string model = string(MODEL) + string("_Pi2=") + to_string((int)Pi2)
     + string("_D=") + to_string((int)Dwater);
 
+  rhoc = (1-DeltaVoV0) * Lambda4;
 
+  /*
   if (xif > xi2) {
     params = {MAXSTEP,TOL,2,RHOC
       ,(double)sitepack[0].size(),TIMESTEP,Nmax //NMAX
@@ -186,6 +186,18 @@ int main(int argc, char** argv)
     //sdn.sample();
     sdn.solve(); // solve PDE & SDE to obtain power spectrum
   }
+  */
+
+  params = {MAXSTEP,TOL,2,rhoc
+	    ,(double)sitepack[0].size(),TIMESTEP,Nmax //NMAX
+	    ,DELTAN,RECURSION //,NCUT
+	    ,Pi2,Dwater,Lambda4,mu1,0 // for Dhybrid
+  }; // set parameters
+  
+  StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
+  
+  //sdn.sample();
+  sdn.solve(); // solve PDE & SDE to obtain power spectrum
 
   
   //StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
@@ -206,7 +218,6 @@ int main(int argc, char** argv)
   // -------------------------------------
 
   cout << endl;
-  */
 }
 
 
