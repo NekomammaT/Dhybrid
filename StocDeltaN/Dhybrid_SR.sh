@@ -1,9 +1,6 @@
 #1/bin/sh
 
-./Dhybrid_SR 50 1 3.0692e-7
-./Dhybrid_SR 50 10 2.8742643286367e-6
-./Dhybrid_SR 50 100 3.3986231385252e-6
-./Dhybrid_SR 50 1000 4.1104691899188e-6
+./Dhybrid_SR 2000 1 4.9295299227e-9
 
 
 <<COMMENTOUT
