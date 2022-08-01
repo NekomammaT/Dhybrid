@@ -84,6 +84,7 @@ int main(int argc, char** argv)
   double psiin = sigmapsi;
   double phimax, phiin;
 
+  /*
   if (Pi2 > 1500) {
     phimax = PHIC + 10./mu1;
     phiin = PHIC + 5./mu1;
@@ -91,6 +92,10 @@ int main(int argc, char** argv)
     phimax = PHIC + 20./mu1;
     phiin = PHIC + 15./mu1;
   }
+  */
+
+  phimax = PHIC + 20./mu1;
+  phiin = PHIC + 15./mu1;
 
   //double phif = PHIC*exp(xif);
   //double psif = sigmapsi*exp(chif);
