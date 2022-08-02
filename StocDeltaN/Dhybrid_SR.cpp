@@ -201,8 +201,8 @@ int main(int argc, char** argv)
   
   StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
   
-  //sdn.sample();
-  sdn.solve(); // solve PDE & SDE to obtain power spectrum
+  sdn.sample();
+  //sdn.solve(); // solve PDE & SDE to obtain power spectrum
 
   
   //StocDeltaN sdn(model,sitepack,xpi,0,params); // declare the system
