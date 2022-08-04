@@ -51,14 +51,13 @@
 int main(int argc, char** argv)
 {
   // -------- for Dhybrid ------------
-  if (argc != 4) {
-    cout << "Pi2, Dwater, DeltaV/V0 を正しく指定してください" << endl;
+  if (argc != 3) {
+    cout << "Pi2 と Dwater を正しく指定してください" << endl;
     return 1;
   }
   
   double Pi2 = atof(argv[1]);
   double Dwater = atof(argv[2]);
-  double DeltaVoV0 = atof(argv[3]);
   
   double mu1 = Pi2/MM/MM/PHIC;
   double Lambda4 = AS*12*M_PI*M_PI/mu1/mu1;
