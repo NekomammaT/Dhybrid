@@ -618,3 +618,27 @@ void JacobiPDE::export_fg(string filename)
   }
 }
 
+void JacobiPDE::import_fg(string filename)
+{
+  ifstream ifs(filename);
+  string str;
+  double tmp;
+  int number = 0;
+
+  while (getline(ifs,str)) {
+    istringstream iss(str);
+    
+    for (int xp=0; xp<xpdim; xp++) {
+      for (int I=0; I<Idim; I++) {
+	iss >> tmp;
+      }
+    }
+
+    for (int func=0; func<funcNo; func++) {
+      iss >> ff[func][number];
+    }
+
+    number++;
+  }
+}
+

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <vector>
 #ifdef _OPENMP
@@ -62,6 +63,7 @@ public:
   int ceilXP(int xp, int I, vector< vector<double> > &psv); // ceil of phase-space value psv in xpI direction
   double Interpolation_f(vector< vector<double> > &psv, int func); // interpolation of func
   void export_fg(string filename); // export func to data file
+  void import_fg(string filename);
   virtual double H(vector<double> &X, vector<double> &P); // Hubble parameter
   virtual double V(vector<double> &X); // potential
   virtual double VI(vector<double> &X, int I); // \partial_I V

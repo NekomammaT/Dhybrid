@@ -167,6 +167,20 @@ void StocDeltaN::BoundaryCondition(double Ncut)
 }
 */
 
+void StocDeltaN::solve_fg()
+{
+  PDE_solve(0);
+  PDE_solve(1);
+  
+  //string str = "Mn_" + model + ".dat";
+
+  // ---------- for Dhybrid -----------
+  string str = DATADIR + string("Mn_") + model + ".dat";
+  // ----------------------------------
+
+  export_fg(str);
+}
+
 void StocDeltaN::solve()
 {
   PDE_solve(0);

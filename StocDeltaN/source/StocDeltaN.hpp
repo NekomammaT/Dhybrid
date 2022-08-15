@@ -49,6 +49,7 @@ public:
   // ------------------------------------------
   
   void solve(); // execute stochastic-delta N
+  void solve_fg(); // solve only <N> and <dN^2>
   void sample(); // obtain 1 sample path
 
   // -------------- plot sample path -------------
